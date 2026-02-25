@@ -2,11 +2,12 @@ package game
 
 import (
 	"fmt"
-	"github.com/sqweek/dialog"
 	"log"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/sqweek/dialog"
 )
 
 func (g *Game) SaveToFile(filename string) error {
@@ -15,6 +16,9 @@ func (g *Game) SaveToFile(filename string) error {
 		return err
 	}
 	defer file.Close()
+
+	g.mu.RLock()
+	defer g.mu.RUnlock()
 
 	for cell, state := range g.cells {
 		line := fmt.Sprintf("%d %d %d\n", cell.X, cell.Y, state)
@@ -27,13 +31,12 @@ func (g *Game) SaveToFile(filename string) error {
 }
 
 func (g *Game) LoadFromFile(filename string) error {
-	g.cells = make(map[Cell]int)
-
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return err
 	}
 
+	newCells := make(map[Cell]int)
 	lines := strings.Split(string(data), "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
@@ -43,8 +46,13 @@ func (g *Game) LoadFromFile(filename string) error {
 		x, _ := strconv.Atoi(parts[0])
 		y, _ := strconv.Atoi(parts[1])
 		state, _ := strconv.Atoi(parts[2])
-		g.cells[Cell{x, y}] = state
+		newCells[Cell{x, y}] = state
 	}
+
+	g.mu.Lock()
+	g.cells = newCells
+	g.mu.Unlock()
+
 	return nil
 }
 

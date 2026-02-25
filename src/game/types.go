@@ -2,6 +2,7 @@ package game
 
 import (
 	"image"
+	"sync"
 	"time"
 )
 
@@ -10,6 +11,7 @@ type Cell struct {
 }
 
 type Game struct {
+	mu             sync.RWMutex
 	cells          map[Cell]int
 	currentState   int
 	running        bool

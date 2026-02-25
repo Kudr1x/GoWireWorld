@@ -16,11 +16,14 @@ func (g *Game) drawLine(x0, y0, x1, y1 int) {
 	err := dx + dy
 
 	for {
+		g.mu.Lock()
 		if g.currentState == Empty {
 			delete(g.cells, Cell{x0, y0})
 		} else {
 			g.cells[Cell{x0, y0}] = g.currentState
 		}
+		g.mu.Unlock()
+
 		if x0 == x1 && y0 == y1 {
 			break
 		}

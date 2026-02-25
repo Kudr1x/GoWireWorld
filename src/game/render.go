@@ -1,12 +1,13 @@
 package game
 
 import (
+	"image/color"
+	"math"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font/basicfont"
-	"image/color"
-	"math"
 )
 
 func (g *Game) Draw(screen *ebiten.Image) {
@@ -74,6 +75,9 @@ func (g *Game) DrawGrid(screen *ebiten.Image) {
 }
 
 func (g *Game) DrawCells(screen *ebiten.Image) {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
 	colors := map[int]color.RGBA{
 		Empty:        {0, 0, 0, 255},
 		Conductor:    {255, 255, 0, 255},

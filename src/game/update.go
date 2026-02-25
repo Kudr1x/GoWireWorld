@@ -1,11 +1,12 @@
 package game
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"image"
 	"math"
 	"time"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 func (g *Game) Update() error {
@@ -53,9 +54,11 @@ func (g *Game) Update() error {
 				g.running = !g.running
 			}
 			if image.Pt(x, y).In(g.saveButton) {
+				g.running = false
 				go g.SaveWithDialog()
 			}
 			if image.Pt(x, y).In(g.loadButton) {
+				g.running = false
 				go g.LoadWithDialog()
 			}
 			if image.Pt(x, y).In(g.slider) {
@@ -65,11 +68,14 @@ func (g *Game) Update() error {
 			g.isDrawing = true
 			cellX, cellY := g.screenToCell(x, y)
 			g.lastCellX, g.lastCellY = cellX, cellY
+
+			g.mu.Lock()
 			if g.currentState == Empty {
 				delete(g.cells, Cell{cellX, cellY})
 			} else {
 				g.cells[Cell{cellX, cellY}] = g.currentState
 			}
+			g.mu.Unlock()
 		}
 	}
 
@@ -116,21 +122,10 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) UpdateCells() {
-	newCells := make(map[Cell]int)
-	temp := make(map[Cell]int)
+	newCells := make(map[Cell]int, len(g.cells))
 
-	for cell := range g.cells {
-		for dy := -1; dy <= 1; dy++ {
-			for dx := -1; dx <= 1; dx++ {
-				temp[Cell{cell.X + dx, cell.Y + dy}] = 0
-			}
-		}
-	}
-
-	for cell := range temp {
-		currentState := g.cells[cell]
+	for cell, currentState := range g.cells {
 		switch currentState {
-		case Empty:
 		case ElectronHead:
 			newCells[cell] = ElectronTail
 		case ElectronTail:
@@ -142,8 +137,7 @@ func (g *Game) UpdateCells() {
 					if dx == 0 && dy == 0 {
 						continue
 					}
-					neighbor := Cell{cell.X + dx, cell.Y + dy}
-					if g.cells[neighbor] == ElectronHead {
+					if g.cells[Cell{cell.X + dx, cell.Y + dy}] == ElectronHead {
 						count++
 					}
 				}
@@ -153,8 +147,12 @@ func (g *Game) UpdateCells() {
 			} else {
 				newCells[cell] = Conductor
 			}
+		default:
+			panic("unhandled default case")
 		}
 	}
 
+	g.mu.Lock()
 	g.cells = newCells
+	g.mu.Unlock()
 }
