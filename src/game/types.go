@@ -11,7 +11,8 @@ type Cell struct {
 }
 
 type Game struct {
-	mu             sync.RWMutex
+	mu sync.RWMutex
+
 	cells          map[Cell]int
 	currentState   int
 	running        bool
@@ -42,20 +43,18 @@ func NewGame() *Game {
 		scale:        16.0,
 		offsetX:      0,
 		offsetY:      0,
-		startButton:  image.Rect(10, 300, 190, 340),
-		saveButton:   image.Rect(10, 400, 190, 440),
-		loadButton:   image.Rect(10, 450, 190, 490),
+		startButton:  image.Rect(UIButtonX, UIStartY, UIButtonX+UIButtonWidth, UIStartY+UIButtonHeight),
+		saveButton:   image.Rect(UIButtonX, UISaveY, UIButtonX+UIButtonWidth, UISaveY+UIButtonHeight),
+		loadButton:   image.Rect(UIButtonX, UILoadY, UIButtonX+UIButtonWidth, UILoadY+UIButtonHeight),
 		stateButtons: []image.Rectangle{
-			image.Rect(10, 10, 190, 50),
-			image.Rect(10, 60, 190, 100),
-			image.Rect(10, 110, 190, 150),
-			image.Rect(10, 160, 190, 200),
+			image.Rect(UIButtonX, UIStateStartY, UIButtonX+UIButtonWidth, UIStateStartY+UIButtonHeight),
+			image.Rect(UIButtonX, UIStateStartY+UIStateGap, UIButtonX+UIButtonWidth, UIStateStartY+UIStateGap+UIButtonHeight),
+			image.Rect(UIButtonX, UIStateStartY+UIStateGap*2, UIButtonX+UIButtonWidth, UIStateStartY+UIStateGap*2+UIButtonHeight),
+			image.Rect(UIButtonX, UIStateStartY+UIStateGap*3, UIButtonX+UIButtonWidth, UIStateStartY+UIStateGap*3+UIButtonHeight),
 		},
-		slider:     image.Rect(10, 250, 190, 270),
+		slider:     image.Rect(UIButtonX, UISliderY, UIButtonX+UIButtonWidth, UISliderY+UISliderHeight),
 		sliderPos:  0.0,
 		lastUpdate: time.Now(),
 		isDrawing:  false,
-		lastCellX:  0,
-		lastCellY:  0,
 	}
 }

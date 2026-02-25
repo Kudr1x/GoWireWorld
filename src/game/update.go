@@ -9,7 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func (g *Game) Update() error {
+func (g *Game) handlePanning() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
 		x, y := ebiten.CursorPosition()
 		if g.prevMouseX != 0 || g.prevMouseY != 0 {
@@ -22,7 +22,9 @@ func (g *Game) Update() error {
 	} else {
 		g.prevMouseX, g.prevMouseY = 0, 0
 	}
+}
 
+func (g *Game) handleZooming() {
 	_, wy := ebiten.Wheel()
 	if wy != 0 {
 		x, y := ebiten.CursorPosition()
@@ -41,7 +43,9 @@ func (g *Game) Update() error {
 			g.offsetY = fy - (fy-g.offsetY)*(g.scale/oldScale)
 		}
 	}
+}
 
+func (g *Game) handleMouseClicks() {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
 		if x < PanelWidth {
@@ -78,7 +82,9 @@ func (g *Game) Update() error {
 			g.mu.Unlock()
 		}
 	}
+}
 
+func (g *Game) handleDrawing() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && g.isDrawing {
 		x, y := ebiten.CursorPosition()
 		if x >= PanelWidth {
@@ -93,7 +99,9 @@ func (g *Game) Update() error {
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 		g.isDrawing = false
 	}
+}
 
+func (g *Game) handleSlider() {
 	if g.draggingSlider {
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 			x, _ := ebiten.CursorPosition()
@@ -108,7 +116,9 @@ func (g *Game) Update() error {
 			g.draggingSlider = false
 		}
 	}
+}
 
+func (g *Game) handleSimulation() {
 	if g.running {
 		now := time.Now()
 		elapsed := now.Sub(g.lastUpdate).Seconds()
@@ -117,40 +127,22 @@ func (g *Game) Update() error {
 			g.lastUpdate = now
 		}
 	}
+}
 
+func (g *Game) Update() error {
+	g.handlePanning()
+	g.handleZooming()
+	g.handleMouseClicks()
+	g.handleDrawing()
+	g.handleSlider()
+	g.handleSimulation()
 	return nil
 }
 
 func (g *Game) UpdateCells() {
-	newCells := make(map[Cell]int, len(g.cells))
-
-	for cell, currentState := range g.cells {
-		switch currentState {
-		case ElectronHead:
-			newCells[cell] = ElectronTail
-		case ElectronTail:
-			newCells[cell] = Conductor
-		case Conductor:
-			count := 0
-			for dy := -1; dy <= 1; dy++ {
-				for dx := -1; dx <= 1; dx++ {
-					if dx == 0 && dy == 0 {
-						continue
-					}
-					if g.cells[Cell{cell.X + dx, cell.Y + dy}] == ElectronHead {
-						count++
-					}
-				}
-			}
-			if count == 1 || count == 2 {
-				newCells[cell] = ElectronHead
-			} else {
-				newCells[cell] = Conductor
-			}
-		default:
-			panic("unhandled default case")
-		}
-	}
+	g.mu.RLock()
+	newCells := CalculateNextState(g.cells)
+	g.mu.RUnlock()
 
 	g.mu.Lock()
 	g.cells = newCells
