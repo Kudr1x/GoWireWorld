@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"goWireWorld/src/core"
 	"log"
 	"os"
 	"strconv"
@@ -36,7 +37,7 @@ func (g *Game) LoadFromFile(filename string) error {
 		return err
 	}
 
-	newCells := make(map[Cell]int)
+	newCells := make(map[core.Cell]int)
 	lines := strings.Split(string(data), "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
@@ -46,7 +47,7 @@ func (g *Game) LoadFromFile(filename string) error {
 		x, _ := strconv.Atoi(parts[0])
 		y, _ := strconv.Atoi(parts[1])
 		state, _ := strconv.Atoi(parts[2])
-		newCells[Cell{x, y}] = state
+		newCells[core.Cell{X: x, Y: y}] = state
 	}
 
 	g.mu.Lock()

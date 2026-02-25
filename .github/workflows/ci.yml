@@ -19,13 +19,37 @@ jobs:
         with:
           go-version: '1.24.0'
 
+      - name: Install Ebitengine dependencies
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y \
+            pkg-config \
+            libgtk-3-dev \
+            libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev \
+            libxinerama-dev libxrandr-dev libxxf86vm-dev
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
 
-  test:
-    name: Test
+  test-core:
+    name: Test Core Logic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.0'
+
+      - name: Run core tests
+        run: go test -v ./src/core/
+
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,5 +69,5 @@ jobs:
             libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev \
             libxinerama-dev libxrandr-dev libxxf86vm-dev
 
-      - name: Run tests
-        run: go test -v ./...
+      - name: Build application
+        run: go build -v -o bin/gowireworld ./src/

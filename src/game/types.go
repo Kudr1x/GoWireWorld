@@ -1,19 +1,16 @@
 package game
 
 import (
+	"goWireWorld/src/core"
 	"image"
 	"sync"
 	"time"
 )
 
-type Cell struct {
-	X, Y int
-}
-
 type Game struct {
 	mu sync.RWMutex
 
-	cells          map[Cell]int
+	cells          map[core.Cell]int
 	currentState   int
 	running        bool
 	speed          float64
@@ -37,8 +34,8 @@ type Game struct {
 
 func NewGame() *Game {
 	return &Game{
-		cells:        make(map[Cell]int),
-		currentState: Conductor,
+		cells:        make(map[core.Cell]int),
+		currentState: core.Conductor,
 		speed:        1.0,
 		scale:        16.0,
 		offsetX:      0,

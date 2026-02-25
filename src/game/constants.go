@@ -7,13 +7,6 @@ import (
 )
 
 const (
-	Empty = iota
-	Conductor
-	ElectronHead
-	ElectronTail
-)
-
-const (
 	ScreenWidth  = 800
 	ScreenHeight = 600
 	PanelWidth   = 200
@@ -55,9 +48,12 @@ var StateButtonColors = []color.RGBA{
 	ColorElectronTail,
 }
 
-var CellTile *ebiten.Image
+var cellTile *ebiten.Image
 
-func init() {
-	CellTile = ebiten.NewImage(1, 1)
-	CellTile.Fill(color.White)
+func GetCellTile() *ebiten.Image {
+	if cellTile == nil {
+		cellTile = ebiten.NewImage(1, 1)
+		cellTile.Fill(color.White)
+	}
+	return cellTile
 }

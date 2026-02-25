@@ -1,6 +1,7 @@
 package game
 
 import (
+	"goWireWorld/src/core"
 	"image/color"
 	"math"
 
@@ -84,10 +85,10 @@ func (g *Game) DrawCells(screen *ebiten.Image) {
 	defer g.mu.RUnlock()
 
 	colors := map[int]color.RGBA{
-		Empty:        ColorEmpty,
-		Conductor:    ColorConductor,
-		ElectronHead: ColorElectronHead,
-		ElectronTail: ColorElectronTail,
+		core.Empty:        ColorEmpty,
+		core.Conductor:    ColorConductor,
+		core.ElectronHead: ColorElectronHead,
+		core.ElectronTail: ColorElectronTail,
 	}
 
 	minX := (0 - g.offsetX) / g.scale
@@ -104,7 +105,7 @@ func (g *Game) DrawCells(screen *ebiten.Image) {
 
 	for x := startX; x <= endX; x++ {
 		for y := startY; y <= endY; y++ {
-			cell := Cell{x, y}
+			cell := core.Cell{X: x, Y: y}
 			if state, ok := g.cells[cell]; ok {
 				sx := PanelWidth + g.offsetX + float64(x)*g.scale
 				sy := g.offsetY + float64(y)*g.scale
@@ -114,7 +115,7 @@ func (g *Game) DrawCells(screen *ebiten.Image) {
 					op.GeoM.Translate(sx, sy)
 					op.ColorScale.Reset()
 					op.ColorScale.ScaleWithColor(colors[state])
-					screen.DrawImage(CellTile, op)
+					screen.DrawImage(GetCellTile(), op)
 				}
 			}
 		}

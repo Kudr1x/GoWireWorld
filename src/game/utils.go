@@ -1,6 +1,9 @@
 package game
 
-import "math"
+import (
+	"goWireWorld/src/core"
+	"math"
+)
 
 func (g *Game) drawLine(x0, y0, x1, y1 int) {
 	dx := abs(x1 - x0)
@@ -17,10 +20,10 @@ func (g *Game) drawLine(x0, y0, x1, y1 int) {
 
 	for {
 		g.mu.Lock()
-		if g.currentState == Empty {
-			delete(g.cells, Cell{x0, y0})
+		if g.currentState == core.Empty {
+			delete(g.cells, core.Cell{X: x0, Y: y0})
 		} else {
-			g.cells[Cell{x0, y0}] = g.currentState
+			g.cells[core.Cell{X: x0, Y: y0}] = g.currentState
 		}
 		g.mu.Unlock()
 

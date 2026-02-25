@@ -1,4 +1,4 @@
-package game
+package core
 
 func CalculateNextState(cells map[Cell]int) map[Cell]int {
 	newCells := make(map[Cell]int, len(cells))

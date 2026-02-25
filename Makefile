@@ -3,5 +3,5 @@ lint:
 	@echo "ok"
 
 test:
-	go test ./src/game/...
+	go test ./src/core/...
 	@echo "ok"

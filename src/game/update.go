@@ -1,6 +1,7 @@
 package game
 
 import (
+	"goWireWorld/src/core"
 	"image"
 	"math"
 	"time"
@@ -74,10 +75,10 @@ func (g *Game) handleMouseClicks() {
 			g.lastCellX, g.lastCellY = cellX, cellY
 
 			g.mu.Lock()
-			if g.currentState == Empty {
-				delete(g.cells, Cell{cellX, cellY})
+			if g.currentState == core.Empty {
+				delete(g.cells, core.Cell{X: cellX, Y: cellY})
 			} else {
-				g.cells[Cell{cellX, cellY}] = g.currentState
+				g.cells[core.Cell{X: cellX, Y: cellY}] = g.currentState
 			}
 			g.mu.Unlock()
 		}
@@ -141,7 +142,7 @@ func (g *Game) Update() error {
 
 func (g *Game) UpdateCells() {
 	g.mu.RLock()
-	newCells := CalculateNextState(g.cells)
+	newCells := core.CalculateNextState(g.cells)
 	g.mu.RUnlock()
 
 	g.mu.Lock()
