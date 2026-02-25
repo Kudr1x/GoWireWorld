@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"goWireWorld/src/game"
 	"log"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func main() {
